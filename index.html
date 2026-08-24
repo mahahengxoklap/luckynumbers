@@ -13,7 +13,6 @@
         .amount-btn { transition: all 0.15s ease; }
         .amount-btn.active-amount { background-color: #eab308; color: #000; border-color: #eab308; font-weight: bold; }
         
-        /* Animation ເງິນຕົກລົງມາ */
         @keyframes fall {
             0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
@@ -204,7 +203,6 @@
                 return;
             }
 
-            // ສົ່ງຂໍ້ມູນໄປຫາ Google Sheet ເພື່ອປະມວນຜົນ (ລ໋ອກຜົນຕາມ Backend)
             const payload = {
                 phone: currentPhone,
                 chosenNumber: selectedNum,
@@ -221,20 +219,13 @@
                 if (data.success) {
                     currentCredit = data.newCredit;
                     document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-                    
                     showPopup(data.isWin, selectedNum, data.winningNumber, betAmount, data.netWinAmount || (betAmount * 5));
                 } else {
                     alert("ເກີດຂໍ້ຜິດພາດໃນລະບົບ");
                 }
             })
             .catch(err => {
-                // กรณี fallback ຫຼິ້ນແບບອອບລາຍຊົ່ວຄາວຖ້າ Sheet ມີບັນຫາ
-                const winningNumber = Math.floor(Math.random() * 10);
-                const isWin = (selectedNum === winningNumber);
-                const netChange = isWin ? (betAmount * 5) : -betAmount;
-                currentCredit += netChange;
-                document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-                showPopup(isWin, selectedNum, winningNumber, betAmount, betAmount * 5);
+                alert("ເຊື່ອມຕໍ່ Server ບໍ່ໄດ້: " + err);
             });
         }
 
@@ -266,7 +257,6 @@
 
         function closePopup() {
             document.getElementById('popupModal').classList.add('hidden');
-            // ລຶບເອັບເຟັກເງິນຕົກ
             document.querySelectorAll('.money-drop').forEach(el => el.remove());
         }
 
