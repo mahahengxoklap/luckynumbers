@@ -10,6 +10,8 @@
         body { font-family: 'Noto Sans Lao', sans-serif; background-color: #0f172a; color: white; }
         .number-btn { transition: all 0.2s ease; }
         .number-btn.selected { background-color: #eab308; color: #000; transform: scale(1.05); box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
+        .amount-btn { transition: all 0.15s ease; }
+        .amount-btn.active-amount { background-color: #eab308; color: #000; border-color: #eab308; font-weight: bold; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -56,10 +58,21 @@
                 <button onclick="selectNumber(9)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="9">9</button>
             </div>
 
-            <!-- Bet Amount Input -->
+            <!-- Bet Amount Input & Quick Buttons -->
             <div class="mb-6">
                 <label class="block text-sm font-semibold mb-2 text-slate-300">ຈຳນວນເງິນວາງພັນ (Kip):</label>
-                <input type="number" id="betAmount" value="10000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-yellow-400">
+                
+                <!-- ປຸ່ມເລືອກເງິນດ່ວນ -->
+                <div class="grid grid-cols-5 gap-2 mb-3">
+                    <button type="button" onclick="setBetAmount(1000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="1000">1,000</button>
+                    <button type="button" onclick="setBetAmount(2000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="2000">2,000</button>
+                    <button type="button" onclick="setBetAmount(5000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="5000">5,000</button>
+                    <button type="button" onclick="setBetAmount(10000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="10000">10,000</button>
+                    <button type="button" onclick="setBetAmount(20000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="20000">20,000</button>
+                </div>
+
+                <!-- ຊ່ອງພິມເງິນເອງ -->
+                <input type="number" id="betAmount" value="10000" oninput="checkCustomAmount()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-yellow-400">
             </div>
 
             <!-- Play Button -->
@@ -75,11 +88,37 @@
     </div>
 
     <script>
-        // ໃສ່ URL ຂອງ Apps Script ທີ່ເຈົ້າຫາກໍ່ສร้างຂຶ້ນມາ
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJpV8ADq9eY0iHtbw4pyBb5RHxGKqd8PaTLtlr2B1cC_zxwhBki7hmJbdholaA2o7m/exec";[cite: 1]
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJpV8ADq9eY0iHtbw4pyBb5RHxGKqd8PaTLtlr2B1cC_zxwhBki7hmJbdholaA2o7m/exec";
         let currentPhone = "";
         let currentCredit = 0;
         let selectedNum = null;
+
+        // ຟັງຊັນເລືອກຈຳນວນເງິນດ່ວນ
+        function setBetAmount(amount) {
+            document.getElementById('betAmount').value = amount;
+            updateAmountButtons(amount);
+        }
+
+        // ໃຫ້ປຸ່ມハイไลท์ສະທ້ອນກັບຄ່າທີ່ພິມເອງ
+        function checkCustomAmount() {
+            const val = parseInt(document.getElementById('betAmount').value);
+            updateAmountButtons(val);
+        }
+
+        function updateAmountButtons(val) {
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                if (parseInt(btn.dataset.amount) === val) {
+                    btn.classList.add('active-amount');
+                } else {
+                    btn.classList.remove('active-amount');
+                }
+            });
+        }
+
+        // ຕັ້ງຄ່າເລີ່ມຕົ້ນໃຫ້ປຸ່ມ 10,000 ເປັນ active ຕອນທຳອິດ
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAmountButtons(10000);
+        });
 
         function loadUser() {
             const phone = document.getElementById('phoneInput').value.trim();
@@ -133,11 +172,9 @@
                 return;
             }
 
-            // ສຸ່ມເລກອອກລາງວັນ (0-9)
             const winningNumber = Math.floor(Math.random() * 10);
             const isWin = (selectedNum === winningNumber);
             
-            // ກົດຕິກາຈ່າຍ x5
             const payoutMultiplier = 5;
             let netChange = 0;
             let resultStatus = "";
@@ -152,7 +189,6 @@
                 resultStatus = "ເສຍໃຈນຳ, ບໍ່ຖືກ ❌";
             }
 
-            // ອັບເດດ UI ທັນທີ
             document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
             const resultBox = document.getElementById('resultBox');
             resultBox.classList.remove('hidden');
@@ -162,7 +198,6 @@
                 ${isWin ? 'ໄດ້ຮັບ: +' + netChange.toLocaleString() + ' ₭' : 'ເສຍ: ' + netChange.toLocaleString() + ' ₭'}
             `;
 
-            // ສົ່ງຂໍ້ມູນບັນທຶກໄປທີ່ Google Sheets
             const payload = {
                 phone: currentPhone,
                 chosenNumber: selectedNum,
