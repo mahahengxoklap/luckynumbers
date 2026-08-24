@@ -1,230 +1,33 @@
-<!DOCTYPE html>
-<html lang="lo">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ເກມທາຍຕົວເລກ - ປຸ່ມກົດ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Noto Sans Lao', sans-serif; background-color: #0f172a; color: white; }
-        .number-btn { transition: all 0.2s ease; }
-        .number-btn.selected { background-color: #eab308; color: #000; transform: scale(1.05); box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
-        .amount-btn { transition: all 0.15s ease; }
-        .amount-btn.active-amount { background-color: #eab308; color: #000; border-color: #eab308; font-weight: bold; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+const payoutMultiplier = 5;
+    let netChange = 0;
+    let resultStatus = "";
+    let netWinAmount = 0;
 
-    <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700">
-        <h1 class="text-2xl font-bold text-center mb-2 text-yellow-400">🎲 ເກມທາຍຕົວເລກ 🎲</h1>
-        <p class="text-center text-slate-400 text-sm mb-6">ເລືອກເລກ 1 ໂຕ (0-9) ແລ້ວລຸ້ນຮັບໂຊກ 5 ເທົ່າ!</p>
+    if (isWin) {
+      netWinAmount = betAmount * payoutMultiplier;
+      netChange = netWinAmount;
+      currentCredit += netChange;
+      totalProfit += netChange;
+      resultStatus = "ຖືກລາງວັນ! 🎉";
+    } else {
+      netChange = -betAmount;
+      currentCredit -= betAmount;
+      totalProfit -= betAmount;
+      resultStatus = "ເສຍໃຈນຳ, ບໍ່ຖືກ ❌";
+    }
 
-        <!-- User Info / Credit -->
-        <div class="bg-slate-900 rounded-xl p-4 mb-6 flex justify-between items-center border border-slate-700">
-            <div>
-                <p class="text-xs text-slate-400">ເບີໂທລະສັບ:</p>
-                <p id="userPhone" class="font-bold text-lg text-emerald-400">-</p>
-            </div>
-            <div class="text-right">
-                <p class="text-xs text-slate-400">ເຄຣດິດຄົງເຫຼືອ:</p>
-                <p id="userCredit" class="font-bold text-xl text-yellow-400">0 ₭</p>
-            </div>
-        </div>
+    // ບັນທຶກລົງ Sheet...
+    userSheet.getRange(userRow, 2).setValue(currentCredit);
+    userSheet.getRange(userRow, 3).setValue(totalProfit);
+    
+    if (logSheet) {
+      logSheet.appendRow([new Date(), phone, chosenNumber, winningNumber, betAmount, resultStatus, netChange, currentCredit]);
+    }
 
-        <!-- Phone Login Section (if not logged in) -->
-        <div id="loginSection" class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-700">
-            <label class="block text-xs text-slate-400 mb-1">ປ້ອນເບີໂທເພື່ອເຂົ້າຫຼິ້ນ:</label>
-            <div class="flex gap-2">
-                <input type="text" id="phoneInput" placeholder="ເຊັ່ນ: 2059897996" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-yellow-400">
-                <button onclick="loadUser()" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-4 py-2 rounded-lg transition">ເຂົ້າສູ່ລະບົບ</button>
-            </div>
-        </div>
-
-        <!-- Game Section -->
-        <div id="gameSection" class="opacity-50 pointer-events-none transition-all">
-            <!-- Number Grid (0-9) -->
-            <label class="block text-sm font-semibold mb-2 text-slate-300">ເລືອກຕົວເລກ (ເລືອກໄດ້ 1 ໂຕ):</label>
-            <div class="grid grid-cols-5 gap-3 mb-6">
-                <button onclick="selectNumber(0)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="0">0</button>
-                <button onclick="selectNumber(1)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="1">1</button>
-                <button onclick="selectNumber(2)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="2">2</button>
-                <button onclick="selectNumber(3)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="3">3</button>
-                <button onclick="selectNumber(4)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="4">4</button>
-                <button onclick="selectNumber(5)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="5">5</button>
-                <button onclick="selectNumber(6)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="6">6</button>
-                <button onclick="selectNumber(7)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="7">7</button>
-                <button onclick="selectNumber(8)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="8">8</button>
-                <button onclick="selectNumber(9)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="9">9</button>
-            </div>
-
-            <!-- Bet Amount Input & Quick Buttons -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold mb-2 text-slate-300">ຈຳນວນເງິນວາງພັນ (Kip):</label>
-                
-                <!-- ປຸ່ມເລືອກເງິນດ່ວນ -->
-                <div class="grid grid-cols-5 gap-2 mb-3">
-                    <button type="button" onclick="setBetAmount(1000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="1000">1,000</button>
-                    <button type="button" onclick="setBetAmount(2000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="2000">2,000</button>
-                    <button type="button" onclick="setBetAmount(5000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="5000">5,000</button>
-                    <button type="button" onclick="setBetAmount(10000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="10000">10,000</button>
-                    <button type="button" onclick="setBetAmount(20000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="20000">20,000</button>
-                </div>
-
-                <!-- ຊ່ອງພິມເງິນເອງ -->
-                <input type="number" id="betAmount" value="10000" oninput="checkCustomAmount()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-yellow-400">
-            </div>
-
-            <!-- Play Button -->
-            <button onclick="playGame()" id="playBtn" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-extrabold py-4 rounded-xl text-lg shadow-lg transition transform active:scale-95 mb-6">
-                🎲 ກົດວາງເດີມພັນ 🎲
-            </button>
-        </div>
-
-        <!-- QR Code & Admin Contact Section -->
-        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center mb-4">
-            <p class="text-sm font-semibold text-slate-300 mb-2">ສະແກນ QR ເພື່ອເຕີມເງິນ</p>
-            <img src="qr.png" alt="QR Code" class="w-40 h-40 mx-auto rounded-lg border border-slate-600 object-contain mb-2">
-            <p class="text-xs text-yellow-400 font-semibold mb-3">✨ ກົດໂອນແລ້ວ ທັກຫາແອັດມິນ ເພື່ອສະໝັກສະມາຊິກ ✨</p>
-            <div class="border-t border-slate-800 pt-3">
-                <p class="text-xs text-slate-400">ຕິດຕໍ່ແອດມິນ (ກົດເພື່ອສົ່ງຂໍ້ຄວາມ/ວັອດແອັບ):</p>
-                <a href="https://wa.me/8562091445369?text=ສະບາຍດີແອດມິນ, ຂ້ອຍກົດໂອນເງິນແລ້ວ ຂໍສະໝັກສະມາຊິກ/ເຕີມເຄຣດິດແດ່" target="_blank" class="inline-block mt-1 text-emerald-400 font-bold text-lg hover:underline">
-                    💬 020 9144 5369
-                </a>
-            </div>
-        </div>
-
-        <!-- Result Box -->
-        <div id="resultBox" class="mt-6 p-4 rounded-xl bg-slate-900 border border-slate-700 text-center hidden">
-            <p id="resultText" class="text-lg font-bold"></p>
-        </div>
-    </div>
-
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJpV8ADq9eY0iHtbw4pyBb5RHxGKqd8PaTLtlr2B1cC_zxwhBki7hmJbdholaA2o7m/exec";
-        let currentPhone = "";
-        let currentCredit = 0;
-        let selectedNum = null;
-
-        function setBetAmount(amount) {
-            document.getElementById('betAmount').value = amount;
-            updateAmountButtons(amount);
-        }
-
-        function checkCustomAmount() {
-            const val = parseInt(document.getElementById('betAmount').value);
-            updateAmountButtons(val);
-        }
-
-        function updateAmountButtons(val) {
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                if (parseInt(btn.dataset.amount) === val) {
-                    btn.classList.add('active-amount');
-                } else {
-                    btn.classList.remove('active-amount');
-                }
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updateAmountButtons(10000);
-        });
-
-        function loadUser() {
-            const phone = document.getElementById('phoneInput').value.trim();
-            if (!phone) {
-                alert("ກະລຸນາປ້ອນເບີໂທລະສັບ!");
-                return;
-            }
-
-            fetch(`${SCRIPT_URL}?phone=${phone}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        currentPhone = phone;
-                        currentCredit = data.credit;
-                        document.getElementById('userPhone').innerText = phone;
-                        document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-                        document.getElementById('loginSection').style.display = 'none';
-                        document.getElementById('gameSection').classList.remove('opacity-50', 'pointer-events-none');
-                    } else {
-                        alert("ບໍ່ພົບເບີໂທນີ້ໃນລະບົບ (ກະລຸນາເພີ່ມໃນ Sheet Users ກ່ອນ)");
-                    }
-                })
-                .catch(err => {
-                    alert("ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່: " + err);
-                });
-        }
-
-        function selectNumber(num) {
-            selectedNum = num;
-            document.querySelectorAll('.number-btn').forEach(btn => {
-                if (parseInt(btn.dataset.num) === num) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
-                }
-            });
-        }
-
-        function playGame() {
-            if (selectedNum === null) {
-                alert("ກະລຸນາເລືອກຕົວເລກກ່ອນ!");
-                return;
-            }
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            if (isNaN(betAmount) || betAmount <= 0) {
-                alert("ກະລຸນາໃສ່ຈຳນວນເງິນວາງພັນໃຫ້ຖືກຕ້ອງ!");
-                return;
-            }
-            if (betAmount > currentCredit) {
-                alert("ເຄຣດິດຂອງທ່ານບໍ່ພຽງພໍ!");
-                return;
-            }
-
-            const winningNumber = Math.floor(Math.random() * 10);
-            const isWin = (selectedNum === winningNumber);
-            
-            const payoutMultiplier = 5;
-            let netChange = 0;
-            let resultStatus = "";
-
-            if (isWin) {
-                netChange = betAmount * payoutMultiplier;
-                currentCredit += netChange;
-                resultStatus = "ຖືກລາງວັນ! 🎉";
-            } else {
-                netChange = -betAmount;
-                currentCredit -= betAmount;
-                resultStatus = "ເສຍໃຈນຳ, ບໍ່ຖືກ ❌";
-            }
-
-            document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-            const resultBox = document.getElementById('resultBox');
-            resultBox.classList.remove('hidden');
-            document.getElementById('resultText').innerHTML = `
-                ເລກທີ່ອອກ: <span class="text-yellow-400 text-2xl">${winningNumber}</span><br>
-                ຜົນ: <span class="${isWin ? 'text-emerald-400' : 'text-rose-400'}">${resultStatus}</span><br>
-                ${isWin ? 'ໄດ້ຮັບ: +' + netChange.toLocaleString() + ' ₭' : 'ເສຍ: ' + netChange.toLocaleString() + ' ₭'}
-            `;
-
-            const payload = {
-                phone: currentPhone,
-                chosenNumber: selectedNum,
-                betAmount: betAmount,
-                winningNumber: winningNumber,
-                result: resultStatus,
-                netChange: netChange,
-                remainingCredit: currentCredit
-            };
-
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        }
-    </script>
-</body>
-</html>
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      winningNumber: winningNumber,
+      isWin: isWin,
+      newCredit: currentCredit,
+      netWinAmount: netWinAmount
+    })).setMimeType(ContentService.MimeType.JSON);
