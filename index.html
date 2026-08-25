@@ -3,212 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ເກມທາຍຕົວເລກ</title>
+    <title>ເກມທາຍຕົວເລກ - Lucky Numbers</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Noto Sans Lao', sans-serif; background-color: #0f172a; color: white; }
-        .number-btn { transition: all 0.2s ease; }
-        .number-btn.selected { background-color: #eab308; color: #000; transform: scale(1.05); box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
-        .amount-btn { transition: all 0.15s ease; }
-        .amount-btn.active-amount { background-color: #eab308; color: #000; border-color: #eab308; font-weight: bold; }
-        
-        @keyframes fall {
-            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-        .money-drop {
-            position: fixed;
-            top: -50px;
-            font-size: 24px;
-            animation: fall linear infinite;
-            z-index: 99;
-            pointer-events: none;
-        }
-    </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700 mb-10">
-        <h1 class="text-2xl font-bold text-center mb-2 text-yellow-400">🎲 ເກມທາຍຕົວເລກ 🎲</h1>
-        <p class="text-center text-slate-400 text-sm mb-6">ເລືອກເລກ 1 ໂຕ (0-9) ແລ້ວລຸ້ນຮັບໂຊກ 5 ເທົ່າ!</p>
+    <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center mb-1 text-yellow-400">🎲 ເກມທາຍຕົວເລກ 🎲</h1>
+        <p class="text-xs text-center text-slate-400 mb-6">ເລືອກເລກໄດ້ສູງສຸດ 9 ໂຕ, ເລືອກຄູ່/ຄີ່ ຫຼື ສູງ/ຕ່ຳ ໄດ້!</p>
 
-        <!-- User Info / Credit -->
-        <div class="bg-slate-900 rounded-xl p-4 mb-6 flex justify-between items-center border border-slate-700">
+        <!-- ຂໍ້ມູນຢູເຊີ ແລະ ເຄຣດິດ -->
+        <div class="bg-slate-900 p-4 rounded-xl mb-4 flex justify-between items-center border border-slate-700">
             <div>
                 <p class="text-xs text-slate-400">ເບີໂທລະສັບ:</p>
-                <p id="userPhone" class="font-bold text-lg text-emerald-400">-</p>
+                <p id="userPhoneDisplay" class="text-emerald-400 font-bold text-lg">-</p>
             </div>
             <div class="text-right">
-                <p class="text-xs text-slate-400">ເຄຣດິດຄົງເຫຼືອ:</p>
-                <p id="userCredit" class="font-bold text-xl text-yellow-400">0 ₭</p>
+                <p class="text-xs text-slate-400">ເຄຣດິດคงເຫຼືອ:</p>
+                <p id="userCredit" class="text-yellow-400 font-bold text-xl">0 ₭</p>
             </div>
         </div>
 
-        <!-- Phone Login Section -->
-        <div id="loginSection" class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-700">
-            <label class="block text-xs text-slate-400 mb-1">ປ້ອນເບີໂທເພື່ອເຂົ້າຫຼິ້ນ:</label>
+        <!-- ຟອມເຂົ້າສູ່ລະບົບ -->
+        <div id="loginSection" class="mb-6">
+            <label class="block text-sm text-slate-300 mb-1">ປ້ອນເບີໂທເພື່ອເຂົ້າສູ່ລະບົບ:</label>
             <div class="flex gap-2">
-                <input type="text" id="phoneInput" placeholder="ເຊັ່ນ: 99677819" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-yellow-400">
-                <button onclick="loadUser()" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold px-4 py-2 rounded-lg transition">ເຂົ້າສູ່ລະບົບ</button>
+                <input type="text" id="phoneInput" placeholder="ຕົວຢ່າງ: 2099123456" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-400">
+                <button onclick="loginUser()" class="bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold px-4 py-2 rounded-lg transition">ເຂົ້າສູ່ລະບົບ</button>
             </div>
         </div>
 
-        <!-- Game Section -->
-        <div id="gameSection" class="opacity-50 pointer-events-none transition-all">
-            <label class="block text-sm font-semibold mb-2 text-slate-300">ເລືອກຕົວເລກ (ເລືອກໄດ້ 1 ໂຕ):</label>
-            <div class="grid grid-cols-5 gap-3 mb-6">
-                <button onclick="selectNumber(0)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="0">0</button>
-                <button onclick="selectNumber(1)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="1">1</button>
-                <button onclick="selectNumber(2)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="2">2</button>
-                <button onclick="selectNumber(3)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="3">3</button>
-                <button onclick="selectNumber(4)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="4">4</button>
-                <button onclick="selectNumber(5)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="5">5</button>
-                <button onclick="selectNumber(6)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="6">6</button>
-                <button onclick="selectNumber(7)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="7">7</button>
-                <button onclick="selectNumber(8)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="8">8</button>
-                <button onclick="selectNumber(9)" class="number-btn bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-xl text-xl" data-num="9">9</button>
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-sm font-semibold mb-2 text-slate-300">ຈຳນວນເງິນວາງພັນ (Kip):</label>
-                <div class="grid grid-cols-5 gap-2 mb-3">
-                    <button type="button" onclick="setBetAmount(1000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="1000">1,000</button>
-                    <button type="button" onclick="setBetAmount(2000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="2000">2,000</button>
-                    <button type="button" onclick="setBetAmount(5000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="5000">5,000</button>
-                    <button type="button" onclick="setBetAmount(10000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="10000">10,000</button>
-                    <button type="button" onclick="setBetAmount(20000)" class="amount-btn bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 rounded-lg border border-slate-600" data-amount="20000">20,000</button>
+        <!-- ເກມ (ເຊື່ອງໄວ້ກ່ອນ ຖ້າບໍ່ທັນ Լ็อกอิน) -->
+        <div id="gameSection" class="hidden">
+            
+            <!-- ເລືອກໂໝດ -->
+            <div class="mb-4">
+                <label class="block text-sm text-slate-300 mb-2">ເລືອກປະເພດການທາຍ:</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setMode('number')" id="modeNumBtn" class="bg-yellow-500 text-slate-950 font-bold py-2 rounded-lg text-sm transition">🔢 ຕິກເລືອກເລກ (0-9)</button>
+                    <button onclick="setMode('special')" id="modeSpecBtn" class="bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-sm transition">⚡ ໂໝດ ໄຮ້ສາດ (ຄູ່/ສູງ)</button>
                 </div>
-                <input type="number" id="betAmount" value="10000" oninput="checkCustomAmount()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-yellow-400">
             </div>
 
-            <button onclick="playGame()" id="playBtn" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-extrabold py-4 rounded-xl text-lg shadow-lg transition transform active:scale-95 mb-6">
+            <!-- ໂໝດເລກ (0-9) -->
+            <div id="numberModeBox" class="mb-4">
+                <div class="flex justify-between items-center mb-1">
+                    <label class="text-sm text-slate-300">ເລືອກຕົວເລກ (ເລືອກໄດ້ 1 ເຖິງ 9 ໂຕ):</label>
+                    <button onclick="clearSelection()" class="text-xs text-rose-400 hover:underline">ລ້າງຄ່າ</button>
+                </div>
+                <div class="grid grid-cols-5 gap-2" id="numberGrid">
+                    <!-- ສ້າງປຸ່ມ 0-9 ດ້ວຍ JS -->
+                </div>
+                <p id="selectionCount" class="text-xs text-slate-400 mt-2">ເລືອກແລ້ວ: 0 ໂຕ</p>
+            </div>
+
+            <!-- ໂໝດພິເສດ (ຄູ່/ຄີ່, ສູງ/ຕ່ຳ) -->
+            <div id="specialModeBox" class="mb-4 hidden">
+                <label class="block text-sm text-slate-300 mb-2">ເລືອກປະເພດພິເສດ:</label>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <button onclick="selectSpecial('even')" id="btnEven" class="bg-slate-700 py-2 rounded-lg text-sm font-bold border border-slate-600">ເລກຄູ່ (0,2,4,6,8)</button>
+                    <button onclick="selectSpecial('odd')" id="btnOdd" class="bg-slate-700 py-2 rounded-lg text-sm font-bold border border-slate-600">ເລກຄີ່ (1,3,5,7,9)</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="selectSpecial('low')" id="btnLow" class="bg-slate-700 py-2 rounded-lg text-sm font-bold border border-slate-600">ຕ່ຳ (0-4)</button>
+                    <button onclick="selectSpecial('high')" id="btnHigh" class="bg-slate-700 py-2 rounded-lg text-sm font-bold border border-slate-600">ສູງ (5-9)</button>
+                </div>
+            </div>
+
+            <!-- ຈຳນວນເງິນເດີມພັນ -->
+            <div class="mb-4">
+                <label class="block text-sm text-slate-300 mb-1">ຈຳນວນເງິນເດີມພັນຕໍ່ 1 ສິດ (Kip):</label>
+                <div class="grid grid-cols-5 gap-1 mb-2">
+                    <button onclick="setBet(1000)" class="bg-slate-700 hover:bg-slate-600 text-xs py-1 rounded">1,000</button>
+                    <button onclick="setBet(2000)" class="bg-slate-700 hover:bg-slate-600 text-xs py-1 rounded">2,000</button>
+                    <button onclick="setBet(5000)" class="bg-slate-700 hover:bg-slate-600 text-xs py-1 rounded">5,000</button>
+                    <button onclick="setBet(10000)" class="bg-slate-700 hover:bg-slate-600 text-xs py-1 rounded font-bold text-yellow-400">10,000</button>
+                    <button onclick="setBet(20000)" class="bg-slate-700 hover:bg-slate-600 text-xs py-1 rounded">20,000</button>
+                </div>
+                <input type="number" id="betAmount" value="10000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-400">
+            </div>
+
+            <!-- ປຸ່ມກົດຫຼິ້ນ -->
+            <button onclick="playGame()" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-bold py-3 rounded-xl shadow-lg transition text-lg">
                 🎲 ກົດວາງເດີມພັນ 🎲
             </button>
         </div>
 
-        <!-- 💰 ເຕີມເງິນ / ຕິດຕໍ່ແອດມິນ -->
-        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-700 text-center mb-4 shadow-inner">
-            <h2 class="text-yellow-400 font-bold text-lg mb-1 flex items-center justify-center gap-2">
-                <span>💰</span> ເຕີມເງິນ / ຕິດຕໍ່ແອດມິນ
-            </h2>
-            <p class="text-xs text-slate-300 mb-4">ສະແກນ QR ໂອນເງິນ (Lao QR) ແລ້ວສົ່ງສລິບໃຫ້ແອດມິນ</p>
-            
-            <div class="bg-white p-3 rounded-xl inline-block shadow-md mb-4">
-                <img src="qr.png" alt="Lao QR Code" class="w-48 h-48 mx-auto object-contain">
-            </div>
-
-            <p class="text-xs text-slate-400 mb-1">📞 ໂທ/WhatsApp ຕິດຕໍ່:</p>
-            <a href="https://wa.me/8562091445369?text=ສະບາຍດີແອດມິນ, ຂ້ອຍໂອນເງິນແລ້ວ ແຄັບຍອດມາແຈ້ງ ຂໍສະໝັກສະມາຊິກແດ່" target="_blank" class="text-emerald-400 font-extrabold text-xl hover:underline block mb-4">
-                020 9144 5369
-            </a>
-
-            <a href="https://wa.me/8562091445369?text=ສະບາຍດີແອດມິນ, ຂ້ອຍໂອນເງິນແລ້ວ ແຄັບຍອດມາແຈ້ງ ຂໍສະໝັກສະມາຊິກແດ່" target="_blank" class="flex items-center justify-center gap-2 w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-3.5 px-4 rounded-xl transition shadow-lg text-base">
-                <span>💬</span> ແຈ້ງເຕີມເງິນຜ່ານ WhatsApp
+        <!-- ຂໍ້ມູນຕິດຕໍ່ແອດມິນ / เติมเงิน -->
+        <div class="mt-8 border-t border-slate-700 pt-4 text-center">
+            <p class="text-xs text-yellow-400 mb-2 font-bold">💰 ເຕີມເງິນ / ຕິດຕໍ່ແອດມິນ</p>
+            <img src="qr.png" alt="QR Code" class="w-32 h-32 mx-auto rounded-lg mb-2 border border-slate-700 bg-white p-1">
+            <p class="text-xs text-slate-400 mb-1">📞 ໂທ/WhatsApp: <strong class="text-white">020 9144 5369</strong></p>
+            <a href="https://wa.me/8562091445369" target="_blank" class="inline-block mt-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                💬 แจ້ງເຕີມເງິນຜ່ານ WhatsApp
             </a>
         </div>
     </div>
 
-    <!-- POPUP MODAL -->
-    <div id="popupModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all scale-95" id="popupContent">
-            <div id="popupIcon" class="text-5xl mb-3">🎉</div>
-            <h3 id="popupTitle" class="text-2xl font-bold mb-2 text-yellow-400">ຂໍສະແດງຄວາມຍິນດີ!</h3>
-            <p id="popupMessage" class="text-slate-300 text-sm mb-6 leading-relaxed">ລາຍລະອຽດຜົນການອອກເລກ...</p>
-            <button onclick="closePopup()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold py-3 rounded-xl text-base transition shadow-lg">
+    <!-- Popup ສະແດງຜົນ -->
+    <div id="popupModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl max-w-sm w-full text-center shadow-2xl">
+            <div id="popupIcon" class="text-5xl mb-2">🎉</div>
+            <h3 id="popupTitle" class="text-xl font-bold mb-2">ຜົນການທາຍ</h3>
+            <div id="popupMsg" class="text-sm text-slate-300 mb-4 space-y-1"></div>
+            <button onclick="closePopup()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold py-2 rounded-xl transition">
                 ຕົກລົງ / ລຸ້ນຕໍ່
             </button>
         </div>
     </div>
 
     <script>
-        // 🔗 ໃຊ້ URL ໃໝ່ທີ່ໄດ້ຈາກການ Deploy ຫຼ້າສຸດ
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyk2kPrMrIj5TvZG23LUx92MDt7WwFNsYsnCquYq2pVa6zi_KtJcPrA42m6a2R-lqYg/exec";
-        
+        const SCRIPT_URL = "ໃສ່_URL_WebApp_ຂອງເຈົ້າບ່ອນນີ້"; // <--- ຢ່າລືມເອົາ Web App URL ມາໃສ່
         let currentPhone = "";
         let currentCredit = 0;
-        let selectedNum = null;
+        let selectedNumbers = [];
+        let currentMode = "number"; // number or special
+        let selectedSpecialType = "";
 
-        function setBetAmount(amount) {
-            document.getElementById('betAmount').value = amount;
-            updateAmountButtons(amount);
+        // ສ້າງປຸ່ມເລກ 0-9
+        const numberGrid = document.getElementById("numberGrid");
+        for (let i = 0; i <= 9; i++) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.innerText = i;
+            btn.id = `num-btn-${i}`;
+            btn.className = "bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-lg text-lg border border-slate-600 transition";
+            btn.onclick = () => toggleNumber(i);
+            numberGrid.appendChild(btn);
         }
 
-        function checkCustomAmount() {
-            const val = parseInt(document.getElementById('betAmount').value);
-            updateAmountButtons(val);
-        }
-
-        function updateAmountButtons(val) {
-            document.querySelectorAll('.amount-btn').forEach(btn => {
-                if (parseInt(btn.dataset.amount) === val) {
-                    btn.classList.add('active-amount');
-                } else {
-                    btn.classList.remove('active-amount');
-                }
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updateAmountButtons(10000);
-        });
-
-        function loadUser() {
-            const phone = document.getElementById('phoneInput').value.trim();
-            if (!phone) {
-                alert("ກະລຸນາປ້ອນເບີໂທລະສັບ!");
-                return;
+        function setMode(mode) {
+            currentMode = mode;
+            if(mode === 'number') {
+                document.getElementById("numberModeBox").classList.remove("hidden");
+                document.getElementById("specialModeBox").classList.add("hidden");
+                document.getElementById("modeNumBtn").className = "bg-yellow-500 text-slate-950 font-bold py-2 rounded-lg text-sm transition";
+                document.getElementById("modeSpecBtn").className = "bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-sm transition";
+            } else {
+                document.getElementById("numberModeBox").classList.add("hidden");
+                document.getElementById("specialModeBox").classList.remove("hidden");
+                document.getElementById("modeSpecBtn").className = "bg-yellow-500 text-slate-950 font-bold py-2 rounded-lg text-sm transition";
+                document.getElementById("modeNumBtn").className = "bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-sm transition";
             }
+        }
+
+        function toggleNumber(num) {
+            const index = selectedNumbers.indexOf(num);
+            if (index > -1) {
+                selectedNumbers.splice(index, 1);
+                document.getElementById(`num-btn-${num}`).className = "bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-lg text-lg border border-slate-600 transition";
+            } else {
+                if (selectedNumbers.length >= 9) {
+                    alert("ເລືອກໄດ້ສູງສຸດພຽງ 9 ໂຕເລກເທົ່າກັນ!");
+                    return;
+                }
+                selectedNumbers.push(num);
+                document.getElementById(`num-btn-${num}`).className = "bg-yellow-500 text-slate-950 font-bold py-3 rounded-lg text-lg border border-yellow-400 transition";
+            }
+            document.getElementById("selectionCount").innerText = `ເລືອກແລ້ວ: ${selectedNumbers.length} ໂຕ`;
+        }
+
+        function clearSelection() {
+            selectedNumbers = [];
+            for (let i = 0; i <= 9; i++) {
+                document.getElementById(`num-btn-${i}`).className = "bg-slate-700 hover:bg-slate-600 font-bold py-3 rounded-lg text-lg border border-slate-600 transition";
+            }
+            document.getElementById("selectionCount").innerText = "ເລືອກແລ້ວ: 0 ໂຕ";
+        }
+
+        function selectSpecial(type) {
+            selectedSpecialType = type;
+            ['even', 'odd', 'low', 'high'].forEach(t => {
+                document.getElementById(`btn${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "bg-slate-700 text-slate-300 py-2 rounded-lg text-sm font-bold border border-slate-600";
+            });
+            document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`).className = "bg-yellow-500 text-slate-950 py-2 rounded-lg text-sm font-bold border border-yellow-400";
+            
+            // แปลg type ເປັນ set ຕົວເລກ
+            if(type === 'even') selectedNumbers = [0, 2, 4, 6, 8];
+            if(type === 'odd') selectedNumbers = [1, 3, 5, 7, 9];
+            if(type === 'low') selectedNumbers = [0, 1, 2, 3, 4];
+            if(type === 'high') selectedNumbers = [5, 6, 7, 8, 9];
+        }
+
+        function setBet(amount) {
+            document.getElementById("betAmount").value = amount;
+        }
+
+        function loginUser() {
+            const phone = document.getElementById("phoneInput").value.trim();
+            if(!phone) { alert("ກະລຸນາປ້ອນເບີໂທກ່ອນ!"); return; }
 
             fetch(`${SCRIPT_URL}?phone=${phone}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
+                    if(data.success) {
                         currentPhone = phone;
                         currentCredit = data.credit;
-                        document.getElementById('userPhone').innerText = phone;
-                        document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-                        document.getElementById('loginSection').style.display = 'none';
-                        document.getElementById('gameSection').classList.remove('opacity-50', 'pointer-events-none');
+                        document.getElementById("userPhoneDisplay").innerText = phone;
+                        document.getElementById("userCredit").innerText = currentCredit.toLocaleString() + " ₭";
+                        document.getElementById("loginSection").classList.add("hidden");
+                        document.getElementById("gameSection").classList.remove("hidden");
                     } else {
-                        alert("ບໍ່ພົບເບີໂທນີ້ໃນລະບົບ: " + (data.message || "ກວດສອບເບີຄືນ"));
+                        alert("ບໍ່ພົບເບີໂທນີ້ໃນລະບົບ: " + data.error);
                     }
                 })
-                .catch(err => {
-                    alert("ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່: " + err);
-                });
-        }
-
-        function selectNumber(num) {
-            selectedNum = num;
-            document.querySelectorAll('.number-btn').forEach(btn => {
-                if (parseInt(btn.dataset.num) === num) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
-                }
-            });
+                .catch(err => alert("ເຊື່ອມຕໍ່ Server ບໍ່ໄດ້: " + err));
         }
 
         function playGame() {
-            if (selectedNum === null) {
-                alert("ກະລຸນາເລືອກຕົວເລກກ່ອນ!");
+            if (selectedNumbers.length === 0) {
+                alert("ກະລຸນາເລືອກຕົວເລກຢ່າງໜ້ອຍ 1 ໂຕ!");
                 return;
             }
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            if (isNaN(betAmount) || betAmount <= 0) {
+            const betAmountPerChoice = parseInt(document.getElementById('betAmount').value);
+            if (isNaN(betAmountPerChoice) || betAmountPerChoice <= 0) {
                 alert("ກະລຸນາໃສ່ຈຳນວນເງິນວາງພັນໃຫ້ຖືກຕ້ອງ!");
                 return;
             }
-            if (betAmount > currentCredit) {
-                alert("ເຄຣດິດຂອງທ່ານບໍ່ພຽງພໍ!");
+
+            const totalBetAmount = betAmountPerChoice * selectedNumbers.length;
+            if (totalBetAmount > currentCredit) {
+                alert("ເຄຣດິດຂອງທ່ານບໍ່ພຽງພໍສຳລັບການເລືອກນີ້!");
                 return;
             }
 
             const payload = {
                 phone: currentPhone,
-                chosenNumber: selectedNum,
-                betAmount: betAmount
+                chosenNumbers: selectedNumbers,
+                betAmountPerChoice: betAmountPerChoice
             };
 
             fetch(SCRIPT_URL, {
@@ -221,57 +243,40 @@
                 if (data.success) {
                     currentCredit = data.newCredit;
                     document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
-                    showPopup(data.isWin, selectedNum, data.winningNumber, betAmount, data.netWinAmount || (betAmount * 5));
+                    showPopup(data.isWin, selectedNumbers, data.winningNumber, totalBetAmount, data.netWinAmount);
                 } else {
-                    alert("ຜິດພາດ: " + (data.error || "ບໍ່ทราบສາເຫດ"));
+                    alert("ຜິດພາດ: " + data.error);
                 }
             })
-            .catch(err => {
-                alert("ເຊື່ອມຕໍ່ Server ບໍ່ໄດ້: " + err);
-            });
+            .catch(err => alert("ເຊື່ອມຕໍ່ Server ບໍ່ໄດ້: " + err));
         }
 
-        function showPopup(isWin, chosen, winning, bet, winAmount) {
+        function showPopup(isWin, chosen, winningNum, totalBet, netWin) {
             const modal = document.getElementById('popupModal');
             const icon = document.getElementById('popupIcon');
             const title = document.getElementById('popupTitle');
-            const msg = document.getElementById('popupMessage');
+            const msg = document.getElementById('popupMsg');
 
             modal.classList.remove('hidden');
-
             if (isWin) {
-                icon.innerHTML = "🎉💰🥳";
-                title.innerText = "ຂໍສະແດງຄວາມຍິນດີ!";
-                title.className = "text-2xl font-bold mb-2 text-emerald-400";
-                msg.innerHTML = `ເຈົ້າເລືອກເລກ: <strong class="text-white text-lg">${chosen}</strong><br>` +
-                                `ຜົນອອກເລກ: <strong class="text-yellow-400 text-xl">${winning}</strong><br>` +
-                                `<span class="text-emerald-400 font-bold text-lg">ຖືກລາງວັນ! ຮັບເງິນ: +${winAmount.toLocaleString()} ₭</span>`;
-                startMoneyRain();
+                icon.innerHTML = "🎉";
+                title.innerText = "ຍິນດີດ້ວຍ! ເຈົ້າຊະນະ!";
+                title.className = "text-xl font-bold mb-2 text-emerald-400";
+                msg.innerHTML = `ເລກທີ່ເຈົ້າເລືອກ: <strong>[${chosen.join(', ')}]</strong><br>` +
+                                `ຜົນອອກເລກ: <strong class="text-yellow-400 text-xl">${winningNum}</strong><br>` +
+                                `<span class="text-emerald-400 font-bold">ໄດ້ຮັບເງິນລາງວັນ: +${netWin.toLocaleString()} ₭</span>`;
             } else {
-                icon.innerHTML = "😢❌";
+                icon.innerHTML = "😢";
                 title.innerText = "ຂໍສະແດງຄວາມເສຍໃຈ";
-                title.className = "text-2xl font-bold mb-2 text-rose-400";
-                msg.innerHTML = `ເຈົ້າເລືອກເລກ: <strong class="text-white text-lg">${chosen}</strong><br>` +
-                                `ຜົນອອກເລກ: <strong class="text-yellow-400 text-xl">${winning}</strong><br>` +
-                                `<span class="text-rose-400 font-bold">ຜິດຫວັງ, ເສຍເງິນ: -${bet.toLocaleString()} ₭</span>`;
+                title.className = "text-xl font-bold mb-2 text-rose-400";
+                msg.innerHTML = `ເລກທີ່ເຈົ້າເລືອກ: <strong>[${chosen.join(', ')}]</strong><br>` +
+                                `ຜົນອອກເລກ: <strong class="text-yellow-400 text-xl">${winningNum}</strong><br>` +
+                                `<span class="text-rose-400 font-bold">ຜິດຫວັງ, ເສຍເງິນ: -${totalBet.toLocaleString()} ₭</span>`;
             }
         }
 
         function closePopup() {
             document.getElementById('popupModal').classList.add('hidden');
-            document.querySelectorAll('.money-drop').forEach(el => el.remove());
-        }
-
-        function startMoneyRain() {
-            for (let i = 0; i < 25; i++) {
-                const drop = document.createElement('div');
-                drop.className = 'money-drop';
-                drop.innerText = ['💵', '💰', '💸', '🪙'][Math.floor(Math.random() * 4)];
-                drop.style.left = Math.random() * 100 + 'vw';
-                drop.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
-                drop.style.animationDelay = (Math.random() * 0.5) + 's';
-                document.body.appendChild(drop);
-            }
         }
     </script>
 </body>
