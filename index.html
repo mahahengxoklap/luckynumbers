@@ -112,7 +112,9 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyk2kPrMrIj5TvZG23LUx92MDt7WwFNsYsnCquYq2pVa6zi_KtJcPrA42m6a2R-lqYg/exec";
+        // 🔗 ໃຊ້ URL ໃໝ່ລ່າສຸດທີ່ເຊື່ອມຕໍ່ກັບ Google Apps Script ທີ່ອັບເດດແລ້ວ
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOxIa2vbobuUwc3V_F1mvVjbBtRF0xLOLvLkgVDUCpKfAaIVvEjymYt80cPb_H3FAR/exec";
+        
         let currentPhone = "";
         let currentCredit = 0;
         let currentMode = "number"; // 'number' ຫຼື 'special'
@@ -245,6 +247,15 @@
                     currentCredit = data.newCredit;
                     document.getElementById('userCredit').innerText = currentCredit.toLocaleString() + " ₭";
                     showPopup(data.isWin, data.winningNumber, data.totalBetAmount, data.netWinAmount);
+                    
+                    // 🔄 ລ້າງຄ່າການເລືອກຫຼັງຈາກຫຼິ້ນສຳເລັດ
+                    clearSelection();
+                    selectedSpecialChoice = "";
+                    ['even', 'odd', 'low', 'high'].forEach(c => {
+                        document.getElementById(`btn-${c}`).className = "bg-slate-700 text-slate-300 py-3 rounded-lg text-sm font-bold border border-slate-600 transition";
+                    });
+                    document.getElementById("specialSelectionDisplay").innerText = "ຍັງບໍ່ໄດ້ເລືອກປະເພດ";
+
                 } else {
                     alert("ຜິດພາດ: " + data.error);
                 }
