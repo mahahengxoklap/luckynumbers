@@ -8,30 +8,47 @@
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- 🏠 ໜ້າເລືອກເກມ (Home Portal) -->
+    <!-- 🏠 ໜ້າເລືອກເກມ ແລະ ເຕີມເງິນ (Home Portal) -->
     <div id="homeSection" class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold mb-2 text-yellow-400">🔥 ມະຫາເຮັງ ໂຊກລາບ 🔥</h1>
-        <p class="text-xs text-slate-400 mb-6">ກະລຸນາເລືອກເກມທີ່ທ່ານຕ້ອງການຫຼິ້ນ</p>
+        <h1 class="text-3xl font-bold mb-1 text-yellow-400">🔥 ມະຫາເຮັງ ໂຊກລາບ 🔥</h1>
+        <p class="text-xs text-slate-400 mb-4">ກະລຸນາເລືອກເກມທີ່ທ່ານຕ້ອງການຫຼິ້ນ</p>
 
-        <div class="space-y-4">
-            <button onclick="openGame('number')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-bold py-4 rounded-xl shadow-lg transition text-lg flex items-center justify-center gap-2">
+        <!-- ປຸ່ມເລືອກເກມ -->
+        <div class="space-y-3 mb-6">
+            <button onclick="openGame('number')" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg transition text-base flex items-center justify-center gap-2">
                 🎲 ເກມທາຍຕົວເລກ (Lucky Numbers)
             </button>
 
-            <button onclick="openGame('fish')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg flex items-center justify-center gap-2">
+            <button onclick="openGame('fish')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition text-base flex items-center justify-center gap-2">
                 🦀 ເກມປູປາເຕົ້າ (Fish Prawn Crab)
             </button>
         </div>
 
-        <div class="mt-8 border-t border-slate-700 pt-4">
-            <p class="text-xs text-slate-400 mb-1">📞 ຕິດຕໍ່ແອດມິນ / ຖາມຂໍ້ມູນ: <strong class="text-white">020 9144 5369</strong></p>
+        <!-- ໂຊ QR Code ແລະ ວິທີສະໝັກ -->
+        <div class="border-t border-slate-700 pt-4">
+            <h3 class="text-sm font-bold text-yellow-400 mb-2">📥 ວິທີສະໝັກ / เຕີມເງິນ</h3>
+            <p class="text-xs text-slate-300 mb-3 px-2 leading-relaxed">
+                ວິທີສະໝັກສະມາຊິກ ສະແກນຄິວອາເຕີມເງິນແລ້ວ ແຈ້ງຍອດໃຫ້ແອັດມິນເລີຍ ຂໍໃຫ້ທ່ານໂຊກມານ! 🍀
+            </p>
+
+            <!-- ສະແດງ QR Code (ດຶງຈາກໄຟລ໌ qr.png ທີ່ຢູ່ໃນ GitHub ຂອງເຈົ້າ) -->
+            <div class="bg-white p-3 rounded-xl inline-block shadow-md mb-3">
+                <img src="qr.png" alt="QR Code" class="w-36 h-36 mx-auto object-contain">
+            </div>
+
+            <p class="text-xs text-slate-400 mb-2">📞 ໂທ / WhatsApp ຕິດຕໍ່:</p>
+            
+            <!-- ປຸ່ມກົດແຊັດຫາແອັດມິນ -->
+            <a href="https://wa.me/8562091445369" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+                💬 ແຈ້ງເຕີມເງິນຜ່ານ WhatsApp (020 9144 5369)
+            </a>
         </div>
     </div>
 
     <!-- 🎲 ເກມທາຍຕົວເລກ (ซ่อนไว้ก่อน) -->
     <div id="gameSection" class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl max-w-md w-full hidden">
         <div class="flex justify-between items-center mb-4">
-            <button onclick="goHome()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-slate-300">⬅️ กลับหน้าหลัก</button>
+            <button onclick="goHome()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-slate-300">⬅️ ກັບໜ້າຫຼັກ</button>
             <h2 class="text-xl font-bold text-yellow-400">🎲 ເກມທາຍຕົວເລກ</h2>
         </div>
 
@@ -133,10 +150,8 @@
 
         function openGame(type) {
             if (type === 'fish') {
-                // ເປີດລິ້ງເກມປູປາເຕົ້າຂຶ້ນມາໃນ Tab ใหม่
                 window.open(FISH_GAME_URL, '_blank');
             } else {
-                // ສະແດງໜ້າເກມທາຍຕົວເລກ
                 document.getElementById('homeSection').classList.add('hidden');
                 document.getElementById('gameSection').classList.remove('hidden');
             }
@@ -147,7 +162,6 @@
             document.getElementById('homeSection').classList.remove('hidden');
         }
 
-        // สร้าง Grid ตัวเลข 0-9
         const numberGrid = document.getElementById("numberGrid");
         for (let i = 0; i <= 9; i++) {
             const btn = document.createElement("button");
