@@ -95,8 +95,16 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm text-slate-300 mb-1" id="betLabel">ຈຳນວນເງິນເດີມພັນຕໍ່ 1 ໂຕ (Kip):</label>
-                <input type="number" id="betAmount" value="10000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-400">
+                <label class="block text-sm text-slate-300 mb-2" id="betLabel">ຈຳນວນເງິນເດີມພັນຕໍ່ 1 ໂຕ (Kip):</label>
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    <button type="button" onclick="setBetAmount(1000, this)" class="bet-button bg-slate-700 hover:bg-yellow-500 hover:text-slate-950 border border-slate-600 font-bold py-2 rounded-lg transition">1,000</button>
+                    <button type="button" onclick="setBetAmount(2000, this)" class="bet-button bg-slate-700 hover:bg-yellow-500 hover:text-slate-950 border border-slate-600 font-bold py-2 rounded-lg transition">2,000</button>
+                    <button type="button" onclick="setBetAmount(5000, this)" class="bet-button bg-slate-700 hover:bg-yellow-500 hover:text-slate-950 border border-slate-600 font-bold py-2 rounded-lg transition">5,000</button>
+                    <button type="button" onclick="setBetAmount(10000, this)" class="bet-button bg-yellow-500 text-slate-950 border border-yellow-400 font-bold py-2 rounded-lg transition">10,000</button>
+                    <button type="button" onclick="setBetAmount(20000, this)" class="bet-button bg-slate-700 hover:bg-yellow-500 hover:text-slate-950 border border-slate-600 font-bold py-2 rounded-lg transition">20,000</button>
+                </div>
+                <label class="block text-xs text-slate-400 mb-1">ຫຼື ພິມຈຳນວນເງິນເອງ:</label>
+                <input type="number" id="betAmount" value="10000" min="1" step="1000" inputmode="numeric" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-yellow-400">
             </div>
 
             <button type="button" onclick="playGame()" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-bold py-3 rounded-xl shadow-lg transition text-lg">
@@ -119,7 +127,7 @@
 
     <script>
         // 🔗 URL ທີ່ອັບເດດใหม่ຖືກຕ້ອງ 100%
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYzOVf005VCQsg6zhtJ8knk5TSUem81DIgYPgt8cg4ZFBok9myUfQsWj90PibXGm5s8g/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeLV3uKwpyF3JdScnTEM7ux7lrt8Z20CYvx1xnTRL4VG_aZZu-KSdi7gwypJSZoRr8bw/exec";
         const FISH_GAME_URL = "https://script.google.com/macros/s/AKfycbxfzSmCge7grF2WIPU3Acpsg7b43uXZueOUQV-qBVUDpj2zTlOAHGIzW7loDPtJ8PPU0w/exec";
 
         let currentPhone = "";
@@ -205,12 +213,25 @@
             document.getElementById("specialSelectionDisplay").innerText = desc;
         }
 
+        async function readServerResponse(response) {
+            const responseText = await response.text();
+            try {
+                return JSON.parse(responseText);
+            } catch (error) {
+                console.error("Server response:", responseText);
+                if (responseText.trim().startsWith("<")) {
+                    throw new Error("Web App URL ບໍ່ຖືກຕ້ອງ ຫຼື Web App ບໍ່ໄດ້ຕັ້ງສິດເປັນ Anyone");
+                }
+                throw new Error("Server ບໍ່ໄດ້ສົ່ງ JSON ກັບມາ");
+            }
+        }
+
         function loginUser() {
             const phone = document.getElementById("phoneInput").value.trim();
             if(!phone) { alert("ກະລຸນາປ້ອນເບີໂທກ່ອນ!"); return; }
 
             fetch(`${SCRIPT_URL}?phone=${phone}`)
-                .then(res => res.json())
+                .then(readServerResponse)
                 .then(data => {
                     if(data.success) {
                         currentPhone = phone;
@@ -224,6 +245,16 @@
                     }
                 })
                 .catch(err => alert("ເຊື່ອມຕໍ່ Server ບໍ່ໄດ້: " + err));
+        }
+
+        function setBetAmount(amount, button) {
+            document.getElementById("betAmount").value = amount;
+            document.querySelectorAll(".bet-button").forEach(item => {
+                item.classList.remove("bg-yellow-500", "text-slate-950", "border-yellow-400");
+                item.classList.add("bg-slate-700", "border-slate-600");
+            });
+            button.classList.remove("bg-slate-700", "border-slate-600");
+            button.classList.add("bg-yellow-500", "text-slate-950", "border-yellow-400");
         }
 
         function playGame() {
@@ -258,7 +289,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
+            .then(readServerResponse)
             .then(data => {
                 if (data.success) {
                     currentCredit = data.newCredit;
